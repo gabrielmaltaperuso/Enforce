@@ -1,7 +1,5 @@
 # Enforce
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.1.
-
 O projeto ficou bem simples e inuitivo, infelizmente não sabia muitas das coisas que o case pedia.
 Infelizmente só vi o email hoje de manhã , então não estudei todas as dificuldades que o projeto me apresentou.
 A funcionalidade de edição não ficou pronta e eu não usei enums.
