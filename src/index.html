@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Enforce</title>
+  <base href="/">
+
+<script type="text/javascript">
+	
+	 function BlockKeybord()
+        {
+            if(window.event) // IE
+            {
+                if((event.keyCode < 48) || (event.keyCode > 57))
+                {
+                    event.returnValue = false;
+                }
+            }
+            else if(e.which) // Netscape/Firefox/Opera
+            {
+                if((event.which < 48) || (event.which > 57))
+                {
+                    event.returnValue = false;
+                }
+            }
+
+
+        }
+
+        function troca(str,strsai,strentra)
+        {
+            while(str.indexOf(strsai)>-1)
+            {
+                str = str.replace(strsai,strentra);
+            }
+            return str;
+        }
+
+        function FormataMoeda(campo,tammax,teclapres,caracter)
+        {
+            if(teclapres == null || teclapres == "undefined")
+            {
+                var tecla = -1;
+            }
+            else
+            {
+                var tecla = teclapres.keyCode;
+            }
+
+            if(caracter == null || caracter == "undefined")
+            {
+                caracter = ".";
+            }
+
+            vr = campo.value;
+            if(caracter != "")
+            {
+                vr = troca(vr,caracter,"");
+            }
+            vr = troca(vr,"/","");
+            vr = troca(vr,",","");
+            vr = troca(vr,".","");
+
+            tam = vr.length;
+            if(tecla > 0)
+            {
+                if(tam < tammax && tecla != 8)
+                {
+                    tam = vr.length + 1;
+                }
+
+                if(tecla == 8)
+                {
+                    tam = tam - 1;
+                }
+            }
+            if(tecla == -1 || tecla == 8 || tecla >= 48 && tecla <= 57 || tecla >= 96 && tecla <= 105)
+            {
+                if(tam <= 2)
+                {
+                    campo.value = vr;
+                }
+                if((tam > 2) && (tam <= 5))
+                {
+                    campo.value = vr.substr(0, tam - 2) + ',' + vr.substr(tam - 2, tam);
+                }
+                if((tam >= 6) && (tam <= 8))
+                {
+                    campo.value = vr.substr(0, tam - 5) + caracter + vr.substr(tam - 5, 3) + ',' + vr.substr(tam - 2, tam);
+                }
+                if((tam >= 9) && (tam <= 11))
+                {
+                    campo.value = vr.substr(0, tam - 8) + caracter + vr.substr(tam - 8, 3) + caracter + vr.substr(tam - 5, 3) + ',' + vr.substr(tam - 2, tam);
+                }
+                if((tam >= 12) && (tam <= 14))
+                {
+                    campo.value = vr.substr(0, tam - 11) + caracter + vr.substr(tam - 11, 3) + caracter + vr.substr(tam - 8, 3) + caracter + vr.substr(tam - 5, 3) + ',' + vr.substr(tam - 2, tam);
+                }
+                if((tam >= 15) && (tam <= 17))
+                {
+                    campo.value = vr.substr(0, tam - 14) + caracter + vr.substr(tam - 14, 3) + caracter + vr.substr(tam - 11, 3) + caracter + vr.substr(tam - 8, 3) + caracter + vr.substr(tam - 5, 3) + ',' + vr.substr(tam - 2, tam);
+                }
+            }
+        }
+
+        function maskKeyPress(objEvent)
+        {
+            var iKeyCode;
+
+            if(window.event) // IE
+            {
+                iKeyCode = objEvent.keyCode;
+                if(iKeyCode>=48 && iKeyCode<=57) return true;
+                return false;
+            }
+            else if(e.which) // Netscape/Firefox/Opera
+            {
+                iKeyCode = objEvent.which;
+                if(iKeyCode>=48 && iKeyCode<=57) return true;
+                return false;
+            }
+
+        }
+
+        function pad(pad, str, padLeft) {
+ 			 if (typeof str === 'undefined') 
+    		return pad;
+  			if (padLeft) {
+   			return (pad + str).slice(-pad.length);
+ 			} else {
+   			return (str + pad).substring(0, pad.length);
+  			}
+		}
+
+
+        function validarCNPJ(cnpj) {
+ 
+    cnpj = cnpj.replace(/[^\d]+/g,'');
+ 
+    if(cnpj == '') return false;
+     
+    if (cnpj.length != 14)
+        return false;
+ 
+    // Elimina CNPJs invalidos conhecidos
+    if (cnpj == "00000000000000" || 
+        cnpj == "11111111111111" || 
+        cnpj == "22222222222222" || 
+        cnpj == "33333333333333" || 
+        cnpj == "44444444444444" || 
+        cnpj == "55555555555555" || 
+        cnpj == "66666666666666" || 
+        cnpj == "77777777777777" || 
+        cnpj == "88888888888888" || 
+        cnpj == "99999999999999")
+        return false;
+         
+    // Valida DVs
+    tamanho = cnpj.length - 2
+    numeros = cnpj.substring(0,tamanho);
+    digitos = cnpj.substring(tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    for (i = tamanho; i >= 1; i--) {
+      soma += numeros.charAt(tamanho - i) * pos--;
+      if (pos < 2)
+            pos = 9;
+    }
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(0))
+        return false;
+         
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0,tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    for (i = tamanho; i >= 1; i--) {
+      soma += numeros.charAt(tamanho - i) * pos--;
+      if (pos < 2)
+            pos = 9;
+    }
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(1))
+          return false;
+           
+    return true;
+    
+}       
+
+       function TestaCPF(strCPF) {
+    		var Soma;
+    		var Resto;
+    		Soma = 0;
+  			if (strCPF == "00000000000") return false;
+  		   
+  			for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  			Resto = (Soma * 10) % 11;
+   
+    		if ((Resto == 10) || (Resto == 11))  Resto = 0;
+   		 	if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+   
+  			Soma = 0;
+    		for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+    		Resto = (Soma * 10) % 11;
+   
+    		if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    		if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+    		return true;
+			}
+</script>
+<script type="text/javascript">
+
+        function valido(){
+        	var doc = document.getElementById("docu");
+            var docstr = doc.value.toString();
+            var ve;
+            docstr = docstr.replace(/[^0-9\.]+/g, '');
+            if(docstr.length<=11){
+                ve = TestaCPF(docstr);
+                if(ve!=true){
+                  document.getElementById('docu').value='';
+                alert("CPF invalido");  
+                }else{
+                    document.getElementById('docu').value=docstr.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                    document.getElementById('tp').value="Física";
+                }
+            }
+            if (docstr.length>11 && docstr.length<=14) {
+                ve = validarCNPJ(docstr);
+                if(ve!=true){
+                  document.getElementById('docu').value='';
+                alert("CNPJ invalido");  
+                }else{
+                    document.getElementById('docu').value= docstr.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5");
+                    document.getElementById('tp').value="Jurídica";
+                }
+            }
+            if(docstr.length>14){
+              document.getElementById('docu').value='';
+                alert("Documento invalido");    
+            }
+
+        }
+
+</script>
+<script type="text/javascript">
+
+        function salvar(){
+            var e = document.getElementById("classificacao");
+            var nomep = document.getElementById('nomeP');
+            var doc = document.getElementById('docu');
+            var tipo = document.getElementById('tp');
+            var nome = document.getElementById('nome');
+            if(nomep.value!='' && doc.value!='' && tipo.value!='' && nome!=''){
+                var clss = e.options[e.selectedIndex].value;
+                var clssn= e.options[e.selectedIndex].text;
+                var chave= (clssn.toUpperCase()).replace(/ /g, '_');
+                chave = chave.replace(/É/g, 'E')
+                var cless;
+                cless ={id:clss, nome:clssn, chaveImportacao:chave};
+                var obj;
+                obj ={Nome_da_parte:nomep.value, Documento:doc.value, Tipo_da_parte:tipo.value, Nome:nome.value, Classificação_processual:cless};
+                var id = localStorage.length+1;
+                localStorage.setItem(id, JSON.stringify(obj));
+                alert("Parte de processo salva com sucesso")
+                document.getElementById('nomeP').value='';
+                document.getElementById('docu').value='';
+                document.getElementById('tp').value='';
+                document.getElementById('nome').value='';
+                window.location.reload();
+            }else{
+                alert("Preencha todos os campos")
+            }
+        }
+
+        function salvvar(){
+            var e = document.getElementById("frente");
+            var ee = document.getElementById("pp");
+            var valor = document.getElementById('valor');
+            var escritorio = document.getElementById('escr');
+            var advogado = document.getElementById('advg');
+            var cnj = document.getElementById('cnj');
+            var data = document.getElementById('data');
+            var juiz = document.getElementById('juiz');
+            if(valor.value!='' && escritorio.value!='' && advogado.value!='' && cnj.value!='' && data.value!='' && juiz.value!=''){
+                var frentee = e.options[e.selectedIndex].value;
+                var partes= ee.options[ee.selectedIndex].text;
+                var obj;
+                obj ={Frente:frentee, Valor_da_causa:valor.value, Escritório_responsavel:escritorio.value, Advogado:advogado.value, CNJ:cnj.value, Data_de_ajuizamento:data.value, Nome_do_Juiz:juiz.value, Partes_do_processo:partes};
+               for(var i=0, len=localStorage.length; i<len; i++) {
+                    var key = localStorage.key(i);
+                    var quant=0;
+                    if(key.length>(key.replace(/[^0-9\.]+/g, '')).length){
+                        quant=quant+1;
+                    }
+                }
+                quant= quant+1;
+                var id = quant.toString()+"a";
+                console.log(id);
+                localStorage.setItem(id, JSON.stringify(obj));
+                alert("Processo salvo com sucesso")
+                document.getElementById('valor').value='';
+                document.getElementById('escr').value='';
+                document.getElementById('advg').value='';
+                document.getElementById('cnj').value='';
+                document.getElementById('data').value='';
+                document.getElementById('juiz').value='';
+                window.location.reload();
+            }else{
+                alert("Preencha todos os campos")
+            }
+        }
+</script>
+
+<script type="text/javascript">
+	 function subcadastro(){
+        	var x = document.getElementById("um");
+        	x.hidden = true;
+        	var y = document.getElementById("dois");
+        	y.hidden = false;
+            var z = document.getElementById("tres");
+            z.hidden = true;
+        	var xb = document.getElementById("umb");
+        	xb.hidden = true;
+        	var yb = document.getElementById("doisb");
+        	yb.hidden = false;
+            var xs = document.getElementById("salvv");
+            xs.hidden = true;
+            var ys = document.getElementById("salv");
+            ys.hidden = false;
+            var m = document.getElementById("mostra");
+            m.hidden = false;
+        }
+
+        function cadastro(){
+        	var x = document.getElementById("um");
+        	x.hidden = false;
+        	var y = document.getElementById("dois");
+        	y.hidden = true;
+            var z = document.getElementById("tres");
+            z.hidden = true;
+        	var xb = document.getElementById("umb");
+        	xb.hidden = false;
+        	var yb = document.getElementById("doisb");
+        	yb.hidden = true;
+            var xs = document.getElementById("salvv");
+            xs.hidden = false;
+            var ys = document.getElementById("salv");
+            ys.hidden = true;
+            var m = document.getElementById("mostra");
+            m.hidden = false;
+        }
+
+        function mostra(){
+            var x = document.getElementById("um");
+            x.hidden = true;
+            var y = document.getElementById("dois");
+            y.hidden = true;
+            var z = document.getElementById("tres");
+            z.hidden = false;
+            var xb = document.getElementById("umb");
+            xb.hidden = false;
+            var yb = document.getElementById("doisb");
+            yb.hidden = false;
+            var xs = document.getElementById("salvv");
+            xs.hidden = true;
+            var ys = document.getElementById("salv");
+            ys.hidden = true;
+            var m = document.getElementById("mostra");
+            m.hidden = true;
+        }
+
+        function part(){
+            var sel = document.getElementById("pp");
+            var sell = document.getElementById("ppp");
+            var selll = document.getElementById("pppp");
+            var se = document.getElementById("pzp");
+            for(var i=0, len=localStorage.length; i<len; i++) {
+            var key = localStorage.key(i);
+            var value = localStorage[key];
+            var opt = document.createElement("option");
+            var optt = document.createElement("option");
+            opt.value = key;
+            optt.value = key;
+            opt.text = value;
+            optt.text = value;
+            console.log(key.indexOf("a"));
+            if(key.indexOf("a")==-1){
+            if(value.indexOf('"Tipo_da_parte":"Jurídica"')!=-1){
+                sel.add(opt, null);
+                sell.add(optt, null);
+                
+            }else{
+            if(value.indexOf('"Tipo_da_parte":"Física"')!=-1){             
+                sel.add(opt, null);
+                selll.add(optt, null);
+            }}
+            }else{
+                se.add(opt, null);
+            }
+        }
+        }
+
+        function remove1(){
+            var e = document.getElementById("ppp");
+            var ky = e.options[e.selectedIndex].value;
+            var key = ky.toString();
+            localStorage.removeItem(key);
+        }
+
+        function remove2(){
+            var e = document.getElementById("pppp");
+            var ky = e.options[e.selectedIndex].value;
+            var key = ky.toString();
+            localStorage.removeItem(key);
+        }
+
+        function remove3(){
+            var e = document.getElementById("pzp");
+            var ky = e.options[e.selectedIndex].value;
+            var key = ky.toString();
+            localStorage.removeItem(key);
+        }
+
+</script>
+<script type="text/javascript">
+          function valida(){
+            var cnj =  document.getElementById("cnj");
+            if((cnj.value).toString().length<15){
+                document.getElementById('cnj').value='';
+                alert("CNJ invalido");
+            }else{
+                var cn =  document.getElementById("cnj").value;
+               cn = cn.replace(/[^0-9\.]+/g, '');
+                cn = pad('00000000000000000000',cn,true);
+                var ver = parseInt((cn.substring(7,9)),10);
+                var p1 = parseInt((cn.substring(0,7)),10) + parseInt((cn.substring(9,13)),10);
+                var p2 = parseInt((cn.substring(13,20)),10);
+                var r1 = p1 % 97;
+                var r2 =(r1 * 1000000000 + p2 * 100) % 97;
+                var vv = 98 - r2;
+                if(vv!=ver){
+                document.getElementById('cnj').value='';
+                alert("CNJ invalido");  
+                } 
+            }
+        }
+</script>
+
+</head>
+<body onload="part()">
+	<button id="umb" onclick="subcadastro()">Cadastrar partes do processo</button>
+	<button hidden="true" id="doisb" onclick="cadastro()">Cadastrar processo</button>
+    <button id="mostra" onclick="mostra()">Gerenciar cadastros</button>
+	<br><br>
+	<form id="um">
+		Frente:  <select id="frente" >
+			<option value="Ativo">Ativo</option>
+			<option value="Passivo">Passivo</option>
+		</select>
+		<br>
+		Valor da causa:  <input type="text" id="valor" name="valor" onkeydown="FormataMoeda(this,10,event)" onkeypress="return maskKeyPress(event)">
+		<br>
+		Escritório responsável:  <input type="text" id="escr" name="escritorio">
+		<br>
+		Advogado:  <input type="text" id="advg" name="advogado">
+		<br>
+		CNJ:  <input type="text" id="cnj" name="cnj" onblur="valida()">
+		<br>
+		Data de ajuizamento:    <input type="date" id="data" name="ajuizamento">
+		<br>
+		Nome do Juiz:    <input type="text" id="juiz" name="juiz">
+		<br>
+		Partes do processo: <select id="pp" name="partes">
+		</select>
+	<br><br></form>
+    <button onclick="salvvar()" id="salvv">Salvar</button>
+
+	<form id="dois" hidden="true">
+		Nome da parte:    <input type="text" id="nomeP" name="nomeParte">
+		<br>
+		Documento:    <input type="text" name="documento"  onblur="valido()" id="docu">
+        <br>
+        Tipo da parte:    <input type="text" disabled="true" id="tp" name="tipo">
+        <br>
+        Nome:    <input type="text" id="nome" name="nome">
+        <br>
+        Classificação processual:    <select id="classificacao">
+            <option value="1">Réu</option>
+            <option value="2">Autor</option>
+            <option value="3">Terceiro interessado</option>
+            <option value="4">Terceiro interessado</option>
+            <option value="5">Recuperando</option>
+            <option value="6">Falido</option>
+            <option value="7">Embargante</option>
+            <option value="8">Embargado</option>
+            <option value="9">Recorrente</option>
+            <option value="10">Recorrido</option>
+            <option value="11">Agravante</option>
+            <option value="12">Agravado</option>
+        </select>
+        <br><br></form>
+        <button onclick="salvar()" hidden="true" id="salv">Salvar</button>
+
+	<form id="tres" hidden="true">
+        
+
+        Escritórios: <select id="ppp">
+        </select><br><button id="pppr" onclick="remove1()">REMOVER</button><br><br>
+        Pessoas: <select id="pppp">
+        </select><br><button id="ppppr" onclick="remove2()">REMOVER</button><br><br>
+        Processos: <select id="pzp">
+        </select><br><button id="pzpr" onclick="remove3()">REMOVER</button><br><br>
+    </form>
+</body>
+</html>
